@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - MC_DATABASE_URL=sqlite+aiosqlite:////data/mission_control.db
+      - MC_AGENT_TEMPLATES_DIR=/agent-templates
+      - MC_MISSIONS_DIR=/missions
+      - MC_CORS_ORIGINS=["http://localhost", "http://localhost:3000", "http://localhost:5173"]
+      - MC_ANTHROPIC_API_KEY=${MC_ANTHROPIC_API_KEY:-}
+      - MC_OPENCLAW_GATEWAY_URL=${MC_OPENCLAW_GATEWAY_URL:-ws://localhost:18789}
+    volumes:
+      - db-data:/data
+      - missions-data:/missions
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  missions-data:

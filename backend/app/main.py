@@ -9,8 +9,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.db.database import close_db, init_db
 from app.approval.router import router as approval_router
+from app.auth.router import router as auth_router
 from app.cost.router import router as cost_router
 from app.events.router import router as events_router
+from app.heartbeat.router import router as heartbeat_router
+from app.messaging.router import router as messaging_router
 from app.mission.router import router as mission_router
 from app.mission.agents_router import router as agents_router
 from app.tasks.router import router as tasks_router
@@ -27,15 +30,26 @@ async def lifespan(app: FastAPI):
     logger.info("Starting Mission Control backend...")
     await init_db()
     logger.info("Database initialized")
+
+    # Start heartbeat monitoring (non-blocking background task)
+    from app.heartbeat.service import heartbeat_service
+    from app.db.database import async_session
+    await heartbeat_service.start(async_session)
+    logger.info("Heartbeat service started")
+
     yield
+
+    # Shutdown
     logger.info("Shutting down Mission Control backend...")
+    from app.heartbeat.service import heartbeat_service as hb
+    await hb.stop()
     await close_db()
 
 
 app = FastAPI(
     title=settings.app_name,
     description="AI Agent Squad Platform — Mission Control Backend",
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
 
@@ -49,6 +63,7 @@ app.add_middleware(
 )
 
 # Routers
+app.include_router(auth_router)
 app.include_router(mission_router)
 app.include_router(agents_router)
 app.include_router(tasks_router)
@@ -57,16 +72,20 @@ app.include_router(cost_router)
 app.include_router(conflict_router)
 app.include_router(delivery_router)
 app.include_router(events_router)
+app.include_router(heartbeat_router)
+app.include_router(messaging_router)
 
 
 # Health check
 @app.get("/api/health")
 async def health():
+    from app.heartbeat.service import heartbeat_service
     return {
         "status": "ok",
         "service": settings.app_name,
-        "version": "0.1.0",
+        "version": "0.2.0",
         "ws_connections": ws_manager.connection_count,
+        "heartbeat_running": heartbeat_service.is_running,
     }
 
 

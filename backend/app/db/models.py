@@ -219,6 +219,33 @@ class CostRecord(Base):
     mission = relationship("Mission", back_populates="cost_records")
 
 
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(String, primary_key=True)
+    email = Column(String, unique=True, nullable=False, index=True)
+    name = Column(String, nullable=False)
+    password_hash = Column(String, nullable=False)
+    password_salt = Column(String, nullable=False)
+    role = Column(String, default="user")  # "user" or "admin"
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+
+class AgentMessage(Base):
+    __tablename__ = "agent_messages"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    mission_id = Column(String, ForeignKey("missions.id"), nullable=False)
+    from_agent_id = Column(String, nullable=False)
+    to_agent_id = Column(String, nullable=False)
+    message_type = Column(String, default="general")  # general, request, response, handoff, escalation
+    content = Column(Text, nullable=False)
+    data = Column(JSON, default=dict)
+    acknowledged = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+
 class ActivityEntry(Base):
     __tablename__ = "activity_feed"
 

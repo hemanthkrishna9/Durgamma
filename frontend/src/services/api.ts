@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const BASE_URL = import.meta.env.VITE_API_URL || "";
 
 async function request<T>(
   path: string,
@@ -125,8 +125,10 @@ export function connectWebSocket(
   missionId: string,
   onMessage: (data: { type: string; data: unknown }) => void
 ): WebSocket {
-  const wsUrl = BASE_URL.replace("http", "ws");
-  const ws = new WebSocket(`${wsUrl}/ws/${missionId}`);
+  const wsBase = BASE_URL
+    ? BASE_URL.replace("http", "ws")
+    : `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}`;
+  const ws = new WebSocket(`${wsBase}/ws/${missionId}`);
 
   ws.onmessage = (event) => {
     try {
