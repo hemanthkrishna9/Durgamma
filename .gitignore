@@ -39,6 +39,7 @@ Thumbs.db
 
 # Missions workspace (generated at runtime)
 missions/*/
+backend/missions/
 
 # Logs
 *.log
