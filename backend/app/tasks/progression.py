@@ -98,20 +98,40 @@ class TaskProgressionService:
         """Progress all tasks for a single mission."""
         now = datetime.now(timezone.utc)
 
-        # Load all tasks for this mission
-        result = await db.execute(
-            select(Task).where(Task.mission_id == mission_id)
-        )
-        tasks = list(result.scalars().all())
-
         # Load all agents for this mission
         result = await db.execute(
             select(Agent).where(Agent.mission_id == mission_id)
         )
         agents = list(result.scalars().all())
+
+        # Auto-activate agents stuck in initializing (no gateway needed)
+        for agent in agents:
+            if agent.status == AgentStatus.INITIALIZING:
+                agent.status = AgentStatus.ACTIVE
+                agent.last_heartbeat = now
+                await log_event(
+                    db, mission_id, EventType.AGENT_STATUS_CHANGED,
+                    message=f"{agent.name} is now active and ready",
+                    agent_id=agent.id,
+                    data={"old": "initializing", "new": "active"},
+                )
+                await ws_manager.broadcast(mission_id, "agent_status_changed", {
+                    "agent_id": agent.id,
+                    "agent_name": agent.name,
+                    "role": agent.role,
+                    "status": "active",
+                })
+                logger.info(f"Agent {agent.name} ({agent.role}) auto-activated")
+
         agents_by_role: dict[str, list[Agent]] = {}
         for agent in agents:
             agents_by_role.setdefault(agent.role, []).append(agent)
+
+        # Load all tasks for this mission
+        result = await db.execute(
+            select(Task).where(Task.mission_id == mission_id)
+        )
+        tasks = list(result.scalars().all())
 
         for task in tasks:
             await self._progress_task(db, task, agents_by_role, now, mission_id)
@@ -190,14 +210,26 @@ class TaskProgressionService:
     def _find_available_agent(
         self, task: Task, agents_by_role: dict[str, list[Agent]]
     ) -> Agent | None:
-        """Find an available agent for a task based on role matching."""
+        """Find an available agent for a task.
+
+        First checks if the task already has a pre-assigned agent (from mission
+        spawn). Falls back to finding any available agent with matching role.
+        """
+        # Check pre-assigned agent first
+        if task.assignee_agent_id:
+            for agents in agents_by_role.values():
+                for agent in agents:
+                    if agent.id == task.assignee_agent_id and agent.status == AgentStatus.ACTIVE:
+                        return agent
+
+        # Fall back to role-based matching
         role = task.assignee_role
         if not role:
             return None
 
         candidates = agents_by_role.get(role, [])
         for agent in candidates:
-            if agent.status in (AgentStatus.ACTIVE, AgentStatus.INITIALIZING):
+            if agent.status == AgentStatus.ACTIVE:
                 return agent
         return None
 

@@ -113,7 +113,7 @@ export default function TaskBoardPage() {
       <div className="page-header">
         <h1>Task Board</h1>
         <span className="muted">
-          Auto-refreshes every {POLL_INTERVAL / 1000}s | Drag cards to move
+          Agents auto-progress tasks | Live updates
         </span>
       </div>
       <div className="kanban-board">
