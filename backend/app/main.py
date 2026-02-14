@@ -14,6 +14,8 @@ from app.events.router import router as events_router
 from app.mission.router import router as mission_router
 from app.mission.agents_router import router as agents_router
 from app.tasks.router import router as tasks_router
+from app.conflict.resolver import router as conflict_router
+from app.delivery.router import router as delivery_router
 from app.websocket import ws_manager
 
 logging.basicConfig(level=logging.INFO)
@@ -52,6 +54,8 @@ app.include_router(agents_router)
 app.include_router(tasks_router)
 app.include_router(approval_router)
 app.include_router(cost_router)
+app.include_router(conflict_router)
+app.include_router(delivery_router)
 app.include_router(events_router)
 
 

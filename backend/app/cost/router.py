@@ -4,8 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from pydantic import BaseModel
+
 from app.db.database import get_db
 from app.db.models import CostRecord, Mission
+from app.cost.manager import record_cost, get_budget_status
 from app.schemas import CostRecordResponse, CostSummary
 
 router = APIRouter(prefix="/api/cost", tags=["cost"])
@@ -77,3 +80,29 @@ async def get_cost_records(
     )
     result = await db.execute(stmt)
     return list(result.scalars().all())
+
+
+class CostRecordCreate(BaseModel):
+    mission_id: str
+    agent_id: str | None = None
+    model: str
+    input_tokens: int
+    output_tokens: int
+    task_id: str | None = None
+
+
+@router.post("/record")
+async def create_cost_record(data: CostRecordCreate, db: AsyncSession = Depends(get_db)):
+    """Record an API call cost and check budget thresholds."""
+    result = await record_cost(
+        db, data.mission_id, data.agent_id,
+        data.model, data.input_tokens, data.output_tokens, data.task_id,
+    )
+    await db.commit()
+    return result
+
+
+@router.get("/{mission_id}/budget")
+async def budget_status(mission_id: str, db: AsyncSession = Depends(get_db)):
+    """Get current budget status."""
+    return await get_budget_status(db, mission_id)

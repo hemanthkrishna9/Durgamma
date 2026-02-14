@@ -22,10 +22,15 @@ logger = logging.getLogger(__name__)
 
 IDENTITY_FILES = ["SOUL.md", "IDENTITY.md", "AGENTS.md", "TOOLS.md", "HEARTBEAT.md"]
 
+# Resolve the backend directory (parent of app/)
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+
 
 def _load_template(role: str, filename: str) -> str | None:
     """Load a template file for a role."""
     template_dir = Path(settings.agent_templates_dir)
+    if not template_dir.is_absolute():
+        template_dir = _BACKEND_DIR / template_dir
     filepath = template_dir / role / filename
     if filepath.exists():
         return filepath.read_text()
