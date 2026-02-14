@@ -1,0 +1,301 @@
+---
+# Agent Registry — All possible agent roles for Mission Control
+# The Mission Analyzer selects from this based on the customer's goal.
+
+roles:
+  orchestrator:
+    display_name: "Orchestrator"
+    category: "core"
+    authority_level: 100
+    domain: "process"
+    description: "Lead coordinator. Delegates, monitors, unblocks, escalates."
+    always_spawn: true
+    model: "claude-sonnet-4-20250514"
+    names: ["Orca", "Nova", "Sage"]
+    tools:
+      - shell
+      - file
+      - git
+      - task_board
+      - agent_messaging
+    spawn_conditions:
+      - "always"
+
+  architect:
+    display_name: "Architect"
+    category: "software_development"
+    authority_level: 90
+    domain: "architecture"
+    description: "System design, tech stack, API contracts, DB schema."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Archie", "Athena", "Blueprint"]
+    tools:
+      - shell
+      - file
+      - git
+      - browser
+    spawn_conditions:
+      - "mission_requires_software"
+      - "mission_requires_system_design"
+
+  backend-dev:
+    display_name: "Backend Developer"
+    category: "software_development"
+    authority_level: 50
+    domain: "backend"
+    description: "APIs, database, authentication, server logic."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Atlas", "Forge", "Stack"]
+    tools:
+      - shell
+      - file
+      - git
+      - browser
+    spawn_conditions:
+      - "mission_requires_backend"
+      - "mission_requires_api"
+
+  frontend-dev:
+    display_name: "Frontend Developer"
+    category: "software_development"
+    authority_level: 50
+    domain: "frontend"
+    description: "UI components, pages, responsive design."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Pixel", "Canvas", "Prism"]
+    tools:
+      - shell
+      - file
+      - git
+      - browser
+    spawn_conditions:
+      - "mission_requires_frontend"
+      - "mission_requires_ui"
+
+  mobile-dev:
+    display_name: "Mobile Developer"
+    category: "software_development"
+    authority_level: 50
+    domain: "mobile"
+    description: "React Native / Flutter mobile apps."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Swift", "Dart", "Flip"]
+    tools:
+      - shell
+      - file
+      - git
+    spawn_conditions:
+      - "mission_requires_mobile_app"
+
+  qa:
+    display_name: "QA Engineer"
+    category: "software_development"
+    authority_level: 80
+    domain: "quality"
+    description: "Testing, code review, bug reporting."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Quinn", "Sentinel", "Scout"]
+    tools:
+      - shell
+      - file
+      - git
+      - browser
+    spawn_conditions:
+      - "mission_requires_software"
+
+  devops:
+    display_name: "DevOps Engineer"
+    category: "software_development"
+    authority_level: 60
+    domain: "infrastructure"
+    description: "Docker, CI/CD, cloud deploy, monitoring."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Harbor", "Helm", "Deploy"]
+    tools:
+      - shell
+      - file
+      - git
+    spawn_conditions:
+      - "mission_requires_deployment"
+      - "mission_requires_infrastructure"
+
+  retention:
+    display_name: "Retention Specialist"
+    category: "business_growth"
+    authority_level: 50
+    domain: "retention"
+    description: "Churn monitoring, re-engagement campaigns."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Keeper", "Bond", "Retain"]
+    tools:
+      - file
+      - browser
+      - shell
+    spawn_conditions:
+      - "mission_requires_retention"
+      - "mission_requires_growth"
+
+  seo:
+    display_name: "SEO Specialist"
+    category: "business_growth"
+    authority_level: 50
+    domain: "seo"
+    description: "Keyword research, audits, content optimization."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Beacon", "Rank", "Spider"]
+    tools:
+      - file
+      - browser
+      - shell
+    spawn_conditions:
+      - "mission_requires_seo"
+      - "mission_requires_growth"
+
+  content-writer:
+    display_name: "Content Writer"
+    category: "business_growth"
+    authority_level: 50
+    domain: "content"
+    description: "Blog posts, articles, social media, email copy."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Quill", "Ink", "Prose"]
+    tools:
+      - file
+      - browser
+    spawn_conditions:
+      - "mission_requires_content"
+      - "mission_requires_marketing"
+
+  researcher:
+    display_name: "Researcher"
+    category: "business_growth"
+    authority_level: 50
+    domain: "research"
+    description: "Competitor analysis, market research, benchmarks."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Lens", "Scout", "Probe"]
+    tools:
+      - file
+      - browser
+      - shell
+    spawn_conditions:
+      - "mission_requires_research"
+      - "mission_requires_analysis"
+
+  email-marketing:
+    display_name: "Email Marketing Specialist"
+    category: "business_growth"
+    authority_level: 50
+    domain: "email"
+    description: "Sequences, newsletters, drip campaigns."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Relay", "Drip", "Pulse"]
+    tools:
+      - file
+      - browser
+    spawn_conditions:
+      - "mission_requires_email_marketing"
+
+  customer-support:
+    display_name: "Customer Support Agent"
+    category: "business_growth"
+    authority_level: 50
+    domain: "support"
+    description: "Ticket triage, FAQ generation, response drafts."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Care", "Help", "Guide"]
+    tools:
+      - file
+      - browser
+    spawn_conditions:
+      - "mission_requires_customer_support"
+
+  data-engineer:
+    display_name: "Data Engineer"
+    category: "data"
+    authority_level: 50
+    domain: "data_engineering"
+    description: "Pipelines, ETL, database optimization."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Pipeline", "Flow", "Stream"]
+    tools:
+      - shell
+      - file
+      - git
+    spawn_conditions:
+      - "mission_requires_data_engineering"
+
+  ml-engineer:
+    display_name: "ML Engineer"
+    category: "data"
+    authority_level: 50
+    domain: "machine_learning"
+    description: "Model training, evaluation, deployment."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Neural", "Tensor", "Matrix"]
+    tools:
+      - shell
+      - file
+      - git
+    spawn_conditions:
+      - "mission_requires_ml"
+      - "mission_requires_ai"
+
+  analytics:
+    display_name: "Analytics Specialist"
+    category: "data"
+    authority_level: 50
+    domain: "analytics"
+    description: "Data analysis, dashboards, KPI tracking."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Metric", "Dash", "Insight"]
+    tools:
+      - file
+      - browser
+      - shell
+    spawn_conditions:
+      - "mission_requires_analytics"
+
+  designer:
+    display_name: "UI/UX Designer"
+    category: "design"
+    authority_level: 50
+    domain: "design"
+    description: "UI mockups, design system, visual identity."
+    always_spawn: false
+    model: "claude-sonnet-4-20250514"
+    names: ["Palette", "Frame", "Sketch"]
+    tools:
+      - file
+      - browser
+    spawn_conditions:
+      - "mission_requires_design"
+      - "mission_requires_ui"
+
+# Category descriptions for Mission Analyzer context
+categories:
+  core:
+    description: "Essential coordination roles"
+  software_development:
+    description: "Roles for building software products"
+  business_growth:
+    description: "Roles for growing a business"
+  data:
+    description: "Roles for data engineering and analysis"
+  design:
+    description: "Roles for visual and UX design"
