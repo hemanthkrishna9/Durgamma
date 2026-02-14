@@ -37,10 +37,17 @@ async def lifespan(app: FastAPI):
     await heartbeat_service.start(async_session)
     logger.info("Heartbeat service started")
 
+    # Start task auto-progression service
+    from app.tasks.progression import progression_service
+    await progression_service.start(async_session)
+    logger.info("Task progression service started")
+
     yield
 
     # Shutdown
     logger.info("Shutting down Mission Control backend...")
+    from app.tasks.progression import progression_service as ps
+    await ps.stop()
     from app.heartbeat.service import heartbeat_service as hb
     await hb.stop()
     await close_db()
@@ -83,12 +90,14 @@ app.include_router(messaging_router)
 @app.get("/api/health")
 async def health():
     from app.heartbeat.service import heartbeat_service
+    from app.tasks.progression import progression_service
     return {
         "status": "ok",
         "service": settings.app_name,
         "version": "0.2.0",
         "ws_connections": ws_manager.connection_count,
         "heartbeat_running": heartbeat_service.is_running,
+        "progression_running": progression_service.is_running,
     }
 
 

@@ -368,11 +368,45 @@
 
 .kanban-cards { display: flex; flex-direction: column; gap: 0.5rem; }
 
+.kanban-column-dragover {
+  background: #1e1e24;
+  border-radius: 8px;
+  outline: 2px dashed #8b5cf6;
+  outline-offset: -2px;
+  transition: background 0.15s, outline 0.15s;
+}
+
 .kanban-card {
   background: #18181b;
   border: 1px solid #27272a;
   border-radius: 6px;
   padding: 0.75rem;
+  cursor: grab;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.kanban-card:hover {
+  border-color: #8b5cf6;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+}
+
+.kanban-card:active { cursor: grabbing; }
+
+.kanban-card-dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+  border-color: #8b5cf6;
+}
+
+.kanban-card-updating {
+  opacity: 0.7;
+  border-color: #f59e0b;
+  animation: pulse-border 1s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: #f59e0b; }
+  50% { border-color: #27272a; }
 }
 
 .kanban-card-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; }
