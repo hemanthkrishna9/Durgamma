@@ -123,16 +123,6 @@ server {
         proxy_read_timeout 86400s;
     }
 
-    # OpenAPI docs
-    location /docs {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-    }
-    location /openapi.json {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-    }
-
     # SPA fallback
     location / {
         try_files $uri $uri/ /index.html;
@@ -171,7 +161,7 @@ echo "=========================================="
 echo ""
 echo "  Backend:   http://20.119.62.230:8000/api/health"
 echo "  Frontend:  http://20.119.62.230"
-echo "  API Docs:  http://20.119.62.230/docs"
+echo "  API Docs:  http://20.119.62.230/api/docs"
 echo ""
 
 # Quick health check

@@ -359,8 +359,8 @@ assert_json "Mission status = closed" "['status']" "closed" "$BODY"
 # ============================================================
 header "15. OpenAPI Schema"
 # ============================================================
-HTTP=$(curl -s -o /tmp/mc_body -w "%{http_code}" "$BASE/openapi.json")
-assert_status "GET /openapi.json" 200 "$HTTP"
+HTTP=$(curl -s -o /tmp/mc_body -w "%{http_code}" "$BASE/api/openapi.json")
+assert_status "GET /api/openapi.json" 200 "$HTTP"
 ENDPOINTS=$(cat /tmp/mc_body | python3 -c "import sys,json; d=json.load(sys.stdin); print(sum(len(v) for v in d['paths'].values()))")
 echo "  Total API endpoints: $ENDPOINTS"
 
